@@ -134,6 +134,9 @@ jobs:
         run: |
           python3 .\build.py --portable --flutter --skip-portable-pack --hwcodec --vram
           mv ./flutter/build/windows/x64/runner/Release ./rustdesk
+          # install_me copia la carpeta sin renombrar el .exe y luego busca <APP_NAME>.exe,
+          # así que el .exe interno tiene que llamarse ya como la app.
+          mv ./rustdesk/rustdesk.exe "./rustdesk/$env:APP_NAME.exe"
           Invoke-WebRequest -Uri https://github.com/rustdesk-org/rdev/releases/download/usbmmidd_v2/usbmmidd_v2.zip -OutFile usbmmidd_v2.zip
           Expand-Archive usbmmidd_v2.zip -DestinationPath .
           Remove-Item -Path usbmmidd_v2\Win32 -Recurse
@@ -153,7 +156,7 @@ jobs:
           sed -i '/dpiAware/d' res/manifest.xml
           pushd ./libs/portable
           pip3 install -r requirements.txt
-          python3 ./generate.py -f ../../rustdesk/ -o . -e ../../rustdesk/rustdesk.exe
+          python3 ./generate.py -f ../../rustdesk/ -o . -e "../../rustdesk/${APP_NAME}.exe"
           popd
           mkdir -p ./out
           mv ./target/release/rustdesk-portable-packer.exe "./out/${APP_NAME}.exe"
